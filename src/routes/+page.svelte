@@ -1,2 +1,57 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+	let input = '';
+
+	/**
+	 * @typedef {Object} Message
+	 * @property {string} user - Name of sender
+	 * @property {string} text - Message content/body
+	 */
+
+	/**@type {Message[]}*/
+	let messages = [];
+
+	const sendMessage = () => {
+		if (input) {
+			messages.push({ user: 'You', text: input });
+			// AI Response, simulated for now
+			messages.push({ user: 'AI', text: 'Thinking...' });
+			input = '';
+		}
+	};
+</script>
+
+<div class="chat-container">
+	<h1>AI Chatbot</h1>
+	<div class="chat-window">
+		{#each messages as message}
+			<p><strong>{message.user}:</strong> {message.text}</p>
+		{/each}
+	</div>
+</div>
+
+<style>
+	.chat-container {
+		max-width: 600px;
+		margin: 0 auto;
+		padding: 1em;
+		font-family: Arial, sans-serif;
+	}
+
+	.chat-window {
+		border: 1px solid #ccc;
+		padding: 1em;
+		height: 300px;
+		overflow-y: scroll;
+		margin-bottom: 1em;
+	}
+
+	input {
+		width: 80%;
+		padding: 0.5em;
+		margin-right: 0.5em;
+	}
+
+	button {
+		padding: 0.5em 1em;
+	}
+</style>
