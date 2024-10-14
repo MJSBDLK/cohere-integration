@@ -27,6 +27,12 @@
 			<p><strong>{message.user}:</strong> {message.text}</p>
 		{/each}
 	</div>
+	<input
+		bind:value={input}
+		on:keydown={(e) => e.key === 'Enter' && sendMessage()}
+		placeholder="Talk to the robot..."
+	/>
+	<button on:click={sendMessage}>Send</button>
 </div>
 
 <style>
