@@ -9,14 +9,23 @@
 
 	/**@type {Message[]}*/
 	let messages = [];
+	/**
+	 * Pushes a new message into the messages array.
+	 * @param {Message} newMessage
+	 * @returns {void}
+	 */
+	const pushMessage = (newMessage) => {
+		messages = [...messages, newMessage];
+	};
 
 	const sendMessage = () => {
 		if (input) {
-			messages.push({ user: 'You', text: input });
+			pushMessage({ user: 'You', text: input });
 			// AI Response, simulated for now
-			messages.push({ user: 'AI', text: 'Thinking...' });
+			pushMessage({ user: 'AI', text: 'Thinking...' });
 			input = '';
 		}
+		console.log(`messages:`, messages);
 	};
 </script>
 
@@ -24,7 +33,10 @@
 	<h1>AI Chatbot</h1>
 	<div class="chat-window">
 		{#each messages as message}
-			<p><strong>{message.user}:</strong> {message.text}</p>
+			<p class={message.user === 'You' ? 'user-message' : 'ai-message'}>
+				<strong class={message.user === 'You' ? 'user-name' : 'ai-name'}>{message.user}:</strong>
+				{message.text}
+			</p>
 		{/each}
 	</div>
 	<input
@@ -60,4 +72,21 @@
 	button {
 		padding: 0.5em 1em;
 	}
+
+	/* #region User and AI messages */
+	.user-message {
+		text-align: right;
+		color: black;
+	}
+	.ai-message {
+		text-align: left;
+		color: black;
+	}
+	.user-name {
+		color: purple;
+	}
+	.ai-name {
+		color: green;
+	}
+	/* #endregion /User and AI messages */
 </style>
