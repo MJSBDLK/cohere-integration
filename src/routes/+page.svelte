@@ -1,8 +1,9 @@
 <script>
-	import axios from 'axios';
-
-	console.warn(`Don't store API keys in the frontend in prod!`);
-	const apiKey = import.meta.env.VITE_COHERE_API_KEY; // Working properly
+	import { Cohere, CohereClientV2 } from 'cohere-ai';
+	console.warn(`Don't store API keys in the frontend!`);
+	const cohere = new CohereClientV2({
+		token: import.meta.env.VITE_COHERE_API_KEY // Working properly
+	});
 
 	let input = '';
 
@@ -30,34 +31,22 @@
 		if (input && !awaitingReplyFromCohere) {
 			awaitingReplyFromCohere = true;
 			try {
-				// Make request to the Cohere API:
-				console.warn(`Need to install a Cohere library for this:`, `https://docs.cohere.com/reference/about`)
-				const response = await axios.post(
-					'https://api.cohere.ai/generate',
-					{
-						model: 'command-r-plus-08-2024',
-						prompt: input, // Simply reads from the input
-						max_tokens: 50
-					},
-					{
-						headers: {
-							Authorization: `Bearer ${apiKey}`,
-							'Content-Type': 'application/json'
-						}
-					}
-				);
+				const response = await cohere.chat({
+					model: 'command',
+					messages: [{ role: 'user', content: input }]
+				});
 
-				console.log(`response.data:`, response.data);
-
-				const responseSuccess = response.data.finish_reason === "COMPLETE"
-				const aiResponse = response.data.meta.text;
-				if (responseSuccess) {
+				console.log(`response:`, response);
+				//@ts-ignore
+				if (response.finishReason === 'COMPLETE') {
+					const text = response?.message?.content?.[0]?.text || null;
+					if (!text) throw new Error(`AI error: malformed response`);
+					// Will the code in this block stop executing if the error is thrown?
 					pushMessage({ user: 'You', text: input });
-					pushMessage({ user: 'AI', text: aiResponse });
-					// Only clear the input if the API call succeeds
+					pushMessage({ user: 'AI', text: text });
 					input = '';
 				} else {
-					throw new Error('Robot is down I repeat robot is down');
+					throw new Error(`AI error - code:${response.finishReason}`);
 				}
 			} catch (error) {
 				pushMessage({ user: 'AI', text: 'Error connecting to AI', className: 'error-message' });
