@@ -1,0 +1,13 @@
+# Enforce CRLF line endings for specific file types
+*.js text eol=crlf
+*.json text eol=crlf
+*.css text eol=crlf
+*.html text eol=crlf
+*.svelte text eol=crlf
+
+# Enforce CRLF for all other text files
+* text=auto eol=crlf
+
+# Leave binary files unchanged
+*.png binary
+*.jpg binary
