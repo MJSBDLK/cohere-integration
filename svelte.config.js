@@ -1,13 +1,32 @@
-import adapter from '@sveltejs/adapter-auto';
+// import adapter from '@sveltejs/adapter-auto';
 
-/** @type {import('@sveltejs/kit').Config} */
-const config = {
-	kit: {
-		// adapter-auto only supports some environments, see https://kit.svelte.dev/docs/adapter-auto for a list.
-		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
-		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
-		adapter: adapter()
-	}
+// /** @type {import('@sveltejs/kit').Config} */
+// const config = {
+// 	kit: {
+// 		// adapter-auto only supports some environments, see https://kit.svelte.dev/docs/adapter-auto for a list.
+// 		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
+// 		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
+// 		adapter: adapter()
+// 	}
+// };
+
+// export default config;
+
+import adapter from '@sveltejs/adapter-static';
+
+export default {
+  kit: {
+    adapter: adapter({
+      fallback: 'index.html',  // Fallback for dynamic routes (SPA behavior)
+      strict: false            // Allow dynamic routes
+    }),
+    paths: {
+      base: '',   // Keep base path empty for relative routing
+    },
+    prerender: {
+      entries: ['*'],  // Prerender all pages
+    }
+  }
 };
 
-export default config;
+
