@@ -1,10 +1,4 @@
 <script>
-	import { Cohere, CohereClientV2 } from 'cohere-ai';
-	console.warn(`Don't store API keys in the frontend!`);
-	const cohere = new CohereClientV2({
-		token: import.meta.env.VITE_COHERE_API_KEY // Working properly
-	});
-
 	let input = '';
 
 	/**
@@ -27,26 +21,45 @@
 
 	let awaitingReplyFromCohere = false;
 
+	const testConnection = async () => {
+		const url = 'http://localhost:3000/api/test'
+		const response = await fetch(url, {
+					method: 'GET',
+				})
+				const data = await response.json()
+				console.log(`response:`, data)
+	}
+
 	const sendMessage = async () => {
 		if (input && !awaitingReplyFromCohere) {
 			awaitingReplyFromCohere = true;
-			try {
-				const response = await cohere.chat({
-					model: 'command',
-					messages: [{ role: 'user', content: input }]
-				});
+			const controller = new AbortController()
+			const abortTimer = setTimeout(() => controller.abort(), 10000)
 
-				console.log(`response:`, response);
-				//@ts-ignore
-				if (response.finishReason === 'COMPLETE') {
-					const text = response?.message?.content?.[0]?.text || null;
+			try {
+				const url = 'http://localhost:3000/api/cohere'
+				const response = await fetch(url, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({message: input}),
+					signal: controller.signal
+				})
+				clearTimeout(abortTimer)
+
+				const data = await response.json();
+				console.log(`response:`, response, data);
+
+				if (!!data?.message?.content?.[0]) {
+					const {text} = data.message.content[0]
 					if (!text) throw new Error(`AI error: malformed response`);
 					// Will the code in this block stop executing if the error is thrown?
 					pushMessage({ user: 'You', text: input });
 					pushMessage({ user: 'AI', text: text });
 					input = '';
 				} else {
-					throw new Error(`AI error - code:${response.finishReason}`);
+					throw new Error(`AI error - code:${data.finishReason}`);
 				}
 			} catch (error) {
 				pushMessage({ user: 'AI', text: 'Error connecting to AI', className: 'error-message' });
@@ -76,6 +89,7 @@
 		placeholder="Talk to the robot..."
 	/>
 	<button on:click={sendMessage}>Send</button>
+	<!-- <button on:click={testConnection}>Test Connection</button> -->
 </div>
 
 <style>
