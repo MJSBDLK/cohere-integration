@@ -21,38 +21,39 @@
 
 	let awaitingReplyFromCohere = false;
 
+	const url = import.meta.env.VITE_API_BASE_URL + '/cohere';
+	console.log(`url:`, url)
+
 	const testConnection = async () => {
-		const url = 'http://localhost:3000/api/test'
 		const response = await fetch(url, {
-					method: 'GET',
-				})
-				const data = await response.json()
-				console.log(`response:`, data)
-	}
+			method: 'GET'
+		});
+		const data = await response.json();
+		console.log(`response:`, data);
+	};
 
 	const sendMessage = async () => {
 		if (input && !awaitingReplyFromCohere) {
 			awaitingReplyFromCohere = true;
-			const controller = new AbortController()
-			const abortTimer = setTimeout(() => controller.abort(), 10000)
+			const controller = new AbortController();
+			const abortTimer = setTimeout(() => controller.abort(), 10000);
 
 			try {
-				const url = 'http://localhost:3000/api/cohere'
 				const response = await fetch(url, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
 					},
-					body: JSON.stringify({message: input}),
+					body: JSON.stringify({ message: input }),
 					signal: controller.signal
-				})
-				clearTimeout(abortTimer)
+				});
+				clearTimeout(abortTimer);
 
 				const data = await response.json();
 				console.log(`response:`, response, data);
 
 				if (!!data?.message?.content?.[0]) {
-					const {text} = data.message.content[0]
+					const { text } = data.message.content[0];
 					if (!text) throw new Error(`AI error: malformed response`);
 					// Will the code in this block stop executing if the error is thrown?
 					pushMessage({ user: 'You', text: input });
