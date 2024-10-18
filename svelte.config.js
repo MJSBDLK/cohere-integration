@@ -7,7 +7,7 @@ export default {
       strict: false            // Allow dynamic routes
     }),
     paths: {
-      base: '',   // Keep base path empty for relative routing
+      base: '/cohere-integration',   // Keep base path empty for relative routing
     },
     prerender: {
       entries: ['*'],  // Prerender all pages
